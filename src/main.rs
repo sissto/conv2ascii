@@ -11,13 +11,9 @@ const DEFAULT_CHARSET: [char; 10] = [' ', '.', ':', ';', '-', '+', 'o', 'O', '&'
 
 fn main() {
     let args = Args::parse();
-    // let args = Args {
-    //     path: "P:/Repos/Lenna.jpg".to_string(),
-    //     output: None,
-    // };
 
     let charset = DEFAULT_CHARSET.to_vec();
-    let converter = ASCIIConverter::new(charset, args.path.to_string());
+    let converter = ASCIIConverter::new(charset, args.path.to_string(), !args.raw);
     let result = converter.convert();
     if result.is_ok() {
         let chars = result.ok().unwrap();

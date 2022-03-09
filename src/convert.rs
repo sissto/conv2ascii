@@ -5,11 +5,16 @@ use std::path::Path;
 pub struct ASCIIConverter {
     charset: Vec<char>,
     path: String,
+    fix_distortion: bool,
 }
 
 impl ASCIIConverter {
-    pub fn new(charset: Vec<char>, path: String) -> Self {
-        return Self { charset, path };
+    pub fn new(charset: Vec<char>, path: String, fix_distortion: bool) -> Self {
+        return Self {
+            charset,
+            path,
+            fix_distortion,
+        };
     }
 
     pub fn convert(&self) -> Result<Vec<Vec<char>>> {
@@ -19,6 +24,10 @@ impl ASCIIConverter {
         let image = image::open(&self.path)?;
         let dim = image.dimensions();
         for y in 0..dim.1 {
+            if self.fix_distortion && y % 2 != 0 {
+                continue;
+            }
+
             let mut chars: Vec<char> = Vec::new();
             for x in 0..dim.0 {
                 let px = image.get_pixel(x, y);
@@ -50,7 +59,6 @@ impl ASCIIConverter {
         if !file_path.exists() || !file_path.is_file() {
             bail!("file or path does not exists");
         }
-        //TODO: check file extension
         return Ok(());
     }
 }

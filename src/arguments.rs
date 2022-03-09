@@ -11,4 +11,8 @@ pub struct Args {
     /// If not specified then the output is set to clipboard.
     #[clap(short, long)]
     pub output: Option<String>,
+
+    /// Do not fix image distortion.
+    #[clap(short, long)]
+    pub raw: bool,
 }
