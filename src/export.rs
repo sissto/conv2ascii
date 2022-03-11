@@ -1,4 +1,4 @@
-use clipboard::{ClipboardContext, ClipboardProvider};
+use clipboard_win::set_clipboard_string;
 use std::{fmt::Write, fs::File, io::Write as IOWrite, path::Path};
 
 pub trait Exporter {
@@ -23,9 +23,7 @@ impl Exporter for ClipboardExporter {
         }
 
         let result = self.get_result_text(data);
-
-        let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
-        ctx.set_contents(result).unwrap();
+        set_clipboard_string(result.as_str()).unwrap();
     }
 }
 

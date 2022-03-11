@@ -5,7 +5,9 @@ use clap::Parser;
 #[clap(author, version, about, long_about = None)]
 pub struct Args {
     /// The image input path.
-    pub path: String,
+    /// If not specified then image from clipboard is used.
+    #[clap(short, long)]
+    pub path: Option<String>,
 
     /// The output path.
     /// If not specified then the output is set to clipboard.

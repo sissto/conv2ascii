@@ -1,27 +1,40 @@
 use anyhow::{bail, Result};
-use image::{GenericImageView, Pixel};
+use image::{DynamicImage, GenericImageView, Pixel};
 use std::path::Path;
 
 pub struct ASCIIConverter {
     charset: Vec<char>,
-    path: String,
     fix_distortion: bool,
 }
 
 impl ASCIIConverter {
-    pub fn new(charset: Vec<char>, path: String, fix_distortion: bool) -> Self {
+    pub fn new(charset: Vec<char>, fix_distortion: bool) -> Self {
         return Self {
             charset,
-            path,
             fix_distortion,
         };
     }
 
-    pub fn convert(&self) -> Result<Vec<Vec<char>>> {
-        self.validate()?;
+    pub fn convert_from_file(&self, file_path: &str) -> Result<Vec<Vec<char>>> {
+        self.validate_from_file(file_path)?;
 
+        let image = image::open(file_path)?;
+        let result = self.convert(image);
+
+        return Ok(result);
+    }
+
+    pub fn convert_from_data(&self, data: Vec<u8>) -> Result<Vec<Vec<char>>> {
+        self.validate_from_data(&data)?;
+
+        let image = image::load_from_memory(data.as_slice())?;
+        let result = self.convert(image);
+
+        return Ok(result);
+    }
+
+    fn convert(&self, image: DynamicImage) -> Vec<Vec<char>> {
         let mut result: Vec<Vec<char>> = Vec::new();
-        let image = image::open(&self.path)?;
         let dim = image.dimensions();
         for y in 0..dim.1 {
             if self.fix_distortion && y % 2 != 0 {
@@ -38,8 +51,7 @@ impl ASCIIConverter {
             }
             result.push(chars);
         }
-
-        return Ok(result);
+        return result;
     }
 
     fn get_char(&self, brightness: u8) -> char {
@@ -48,16 +60,26 @@ impl ASCIIConverter {
         return self.charset[index as usize];
     }
 
-    fn validate(&self) -> Result<()> {
+    fn validate_from_file(&self, file_path: &str) -> Result<()> {
         if self.charset.is_empty() {
             bail!("charset is not set");
         }
-        if self.path.is_empty() {
+        if file_path.is_empty() {
             bail!("path is not set");
         }
-        let file_path = Path::new(&self.path);
+        let file_path = Path::new(file_path);
         if !file_path.exists() || !file_path.is_file() {
             bail!("file or path does not exists");
+        }
+        return Ok(());
+    }
+
+    fn validate_from_data(&self, data: &Vec<u8>) -> Result<()> {
+        if self.charset.is_empty() {
+            bail!("charset is not set");
+        }
+        if data.is_empty() {
+            bail!("no data given");
         }
         return Ok(());
     }
