@@ -1,14 +1,9 @@
-mod arguments;
-mod convert;
-mod export;
-mod import;
-
 use anyhow::Error;
-use arguments::Args;
 use clap::StructOpt;
-use convert::ASCIIConverter;
-use export::{ClipboardExporter, Exporter, FileExporter};
-use import::ClipboardImporter;
+use conv2ascii::arguments::Args;
+use conv2ascii::convert::ASCIIConverter;
+use conv2ascii::export::{ClipboardExporter, Exporter, FileExporter};
+use conv2ascii::import::ClipboardImporter;
 
 const DEFAULT_CHARSET: [char; 10] = [' ', '.', ':', ';', '-', '+', 'o', 'O', '&', '@'];
 
